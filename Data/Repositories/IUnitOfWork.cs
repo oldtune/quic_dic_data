@@ -1,6 +1,9 @@
+
+using Common.Models;
+
 namespace Data.Repositories;
 public interface IUnitOfWork
 {
-    public Task SaveChanges();
+    public Task<Result<None>> SaveChanges();
     public void Attach();
 }

@@ -41,7 +41,7 @@ builder.Services.AddCors((options) =>
 builder.Services.AddDbContextPool<DictionaryDbContext>(config =>
 {
     config.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-    config.UseSqlServer(builder.Configuration.GetConnectionString("Porfolio"), dbOptions =>
+    config.UseNpgsql(builder.Configuration.GetConnectionString("Dictionary"), dbOptions =>
     {
         dbOptions.CommandTimeout(30);
         dbOptions.EnableRetryOnFailure();

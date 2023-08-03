@@ -9,5 +9,8 @@ public interface IBaseRepository<T> where T : IDatabaseObject
     public void AddRange(IEnumerable<T> collection);
     public void DeleteRange(IEnumerable<T> collection);
     public void UpdateRange(IEnumerable<T> collection);
-    public IEnumerable<T> Query<TResult>(Expression<Func<T, TResult>> seletor = null, Expression<Func<T, bool>> filter = null);
+    public Task<IEnumerable<T>> QueryAsync<TResult>(Expression<Func<T, TResult>> seletor = null, Expression<Func<T, bool>> filter = null);
+    public Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+    public Task<T> FindAsync(object primaryKey);
+    public Task<T> FindAsync(params object[] primaryKeys);
 }

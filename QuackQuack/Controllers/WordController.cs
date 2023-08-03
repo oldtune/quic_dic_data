@@ -1,3 +1,4 @@
+using Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace QuackQuack.Controllers;
@@ -6,21 +7,19 @@ namespace QuackQuack.Controllers;
 [Route("api/[controller]")]
 public class WordController : ControllerBase
 {
-    ILogger<WordController> _logger;
+    readonly IUnitOfWork _unitOfWork;
+    readonly ILogger<WordController> _logger;
 
-    public WordController(ILogger<WordController> logger)
+    public WordController(IUnitOfWork unitOfWork, ILogger<WordController> logger)
     {
+        _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     [HttpGet("{word}")]
-    public IActionResult GetWordDefinition(string word)
+    public async Task<IActionResult> GetWordDefinition(string word)
     {
-        var wordDef = new
-        {
-            definition = "greeting",
-            word = "hello"
-        };
-
-        return Ok(wordDef);
+        var wordFound = await _unitOfWork.WordRepository.FirstOrDefaultAsync(x => x.Word == word);
+        return Ok(wordFound);
     }
 }

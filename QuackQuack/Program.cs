@@ -21,12 +21,19 @@ builder.Services.AddOpenTelemetry()
             .ConfigureResource(resource => resource
                 .AddService(DiagnosticsConfig.ServiceName))
             .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddJaegerExporter()
             .AddConsoleExporter())
     .WithMetrics(metricsProviderBuilder =>
         metricsProviderBuilder
         .ConfigureResource(resource => resource
                 .AddService(DiagnosticsConfig.ServiceName))
             .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter(option =>
+            {
+                option.Endpoint = new Uri("http://localhost:4317");
+            })
             .AddConsoleExporter());
 
 

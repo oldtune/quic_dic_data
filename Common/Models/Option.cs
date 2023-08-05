@@ -1,40 +1,35 @@
-﻿namespace Common.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using System.Collections.ObjectModel;
 
-public struct Option<T>
+namespace Common.Models;
+public class Option<T>
 {
-    public T Value { get; }
-    public HasValue {get;}
+    public T Value { get; private set; }
+    public bool HasValue { get; private set; }
 
-private Option<T>()
-{
-    Value = default(T);
-    HasValue = false;
-}
+    private Option()
+    {
+        Value = default(T);
+        HasValue = false;
+    }
 
-private Option<T>(T value){
-    if (value)
+    public static Option<T> CreateSome<T>(T value)
     {
         if (value != null)
         {
-            Value = value;
-            HasValue = true;
+            return new Option<T>
+            {
+
+                Value = value,
+                HasValue = true
+            };
         }
 
-        HasValue = false;
-        Value = default(T);
+        return new Option<T>
+        {
+            HasValue = false,
+            Value = default(T)
+        };
     }
-}
-
-public static CreateSome(T value)
-{
-    return new Option<T>(value);
-}
-
-public static CreateNone<T>()
-{
-    return new Option<T>(value);
-}
 }

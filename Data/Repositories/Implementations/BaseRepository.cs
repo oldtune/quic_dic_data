@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Common.Models;
 using Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,9 +14,9 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IDatabaseOb
         _set = db.Set<T>();
     }
 
-    public async Task Add(T obj)
+    public async Task<Result<None>> Add(T obj)
     {
-        await _set.AddAsync(obj);
+        Result<None>.FromTask(() => _set.AddAsync(obj));
     }
 
     public async Task AddRange(IEnumerable<T> collection)
@@ -33,12 +34,12 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IDatabaseOb
         _set.RemoveRange(collection);
     }
 
-    public async Task<T> FindAsync(object primaryKey)
+    public async Task<Result<T>> FindAsync(object primaryKey)
     {
-        return await _set.FindAsync(primaryKey);
+        return await Result._set.FindAsync(primaryKey);
     }
 
-    public async Task<T> FindAsync(params object[] primaryKeys)
+    public async Task<Result<T>> FindAsync(params object[] primaryKeys)
     {
         return await _set.FindAsync(primaryKeys);
     }

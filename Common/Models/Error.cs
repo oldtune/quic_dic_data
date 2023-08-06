@@ -27,6 +27,7 @@ public class Error
 
     public Error(Exception ex)
     {
+        _exception = ex;
         _customError.Add("Unexpected error");
     }
 }

@@ -1,14 +1,9 @@
-﻿using System.Collections.Generic;
-using System;
-using System.Collections.ObjectModel;
-using System.Threading;
-
-namespace Common.Models;
+﻿namespace Common.Models;
 public class Result<T>
 {
-    public bool Ok => _error != null;
-    private T _data;
-    private Error _error;
+    public bool Ok => _error == null;
+    private T? _data;
+    private Error? _error;
     public T Unwrap()
     {
         if (Ok)
@@ -17,30 +12,6 @@ public class Result<T>
         }
 
         throw new InvalidOperationException("Cannot unwrap failed result");
-    }
-
-    public static Result<T> CreateResult(T value)
-    {
-        if (value == null)
-        {
-            return new Result<T>
-            {
-                _error = new Error(new Exception("Null value"))
-            };
-        }
-
-        if (typeof(T) == typeof(Exception))
-        {
-            return new Result<T>
-            {
-                _error = new Error(value as Exception)
-            };
-        }
-
-        return new Result<T>
-        {
-            _data = value
-        };
     }
 
     public static Result<T> CreateError(Error error)
@@ -69,38 +40,23 @@ public class Result<T>
         return _error;
     }
 
-    public async static Task<Result<T>> FromTask(Func<Task<T>> task)
+    public static Result<T> CreateSuccess(T value)
     {
-        try
+        return new Result<T>
         {
-            var result = await task();
-            return CreateResult(result);
-        }
-        catch (Exception ex)
-        {
-            return CreateError(ex);
-        }
+            _data = value
+        };
     }
+}
 
-    public async static Task<Result<None>> FromTask(Func<Task> task)
-    {
-        try
-        {
-            await task();
-            return Result<None>.CreateResult(None.Default);
-        }
-        catch (Exception ex)
-        {
-            return Result<None>.CreateError(ex);
-        }
-    }
-
-    public async static Task<Result<T>> FromValueTask(Func<ValueTask<T>> valueTask)
+public static class Result
+{
+    public async static Task<Result<T>> FromValueTask<T>(Func<ValueTask<T>> valueTask)
     {
         try
         {
             var result = await valueTask();
-            return CreateSuccess(result);
+            return Result<T>.CreateSuccess(result);
         }
         catch (Exception ex)
         {
@@ -113,7 +69,7 @@ public class Result<T>
     {
         try
         {
-            valueTask();
+            await valueTask();
             return Result<None>.CreateSuccess(None.Default);
         }
         catch (Exception ex)
@@ -122,11 +78,11 @@ public class Result<T>
         }
     }
 
-    public async static Task<Result<None>> FromValueTaskNone(Func<ValueTask<T>> valueTask)
+    public async static Task<Result<None>> FromValueTaskNone<T>(Func<ValueTask<T>> valueTask)
     {
         try
         {
-            valueTask();
+            await valueTask();
             return Result<None>.CreateSuccess(None.Default);
         }
         catch (Exception ex)
@@ -135,11 +91,11 @@ public class Result<T>
         }
     }
 
-    public async static Task<Result<None>> FromTaskNone(Func<Task<T>> task)
+    public async static Task<Result<None>> FromTaskNone<T>(Func<Task<T>> task)
     {
         try
         {
-            task();
+            await task();
             return Result<None>.CreateSuccess(None.Default);
         }
         catch (Exception ex)
@@ -148,9 +104,7 @@ public class Result<T>
         }
     }
 
-
-
-    private async Task<Result<T>> CreateFromTryCatch(Func<Task<T>> task)
+    public async static Task<Result<T>> FromTask<T>(Func<Task<T>> task)
     {
         try
         {
@@ -159,29 +113,41 @@ public class Result<T>
         }
         catch (Exception ex)
         {
-            return Result<T>.CreateError(ex);
+            return CreateError<T>(ex);
         }
     }
 
-    private Result<T> CreateFromTryCatch(Func<T> func)
+    public async static Task<Result<None>> FromTask(Func<Task> task)
     {
         try
         {
-            var result = func();
-            return CreateSuccess(result);
+            await task();
+            return CreateSuccess(None.Default);
         }
         catch (Exception ex)
         {
-            return CreateError(ex);
+            return CreateError<None>(ex);
         }
     }
 
-    public static Result<T> CreateSuccess(T value)
+    public static Result<T> FromNotNull<T>(T value) where T : notnull
     {
-        return new Result<T>
+        if (value == null)
         {
-            _data = value
-        };
+            return CreateError<T>(new NullReferenceException());
+        }
+
+        return CreateSuccess(value);
+    }
+
+    public static Result<T> CreateSuccess<T>(T value)
+    {
+        return Result<T>.CreateSuccess(value);
+    }
+
+    public static Result<T> CreateError<T>(Exception ex)
+    {
+        return Result<T>.CreateError(ex);
     }
 }
 

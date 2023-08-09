@@ -19,7 +19,7 @@ public class WordController : ControllerBase
     [HttpGet("{word}")]
     public async Task<IActionResult> GetWordDefinition(string word)
     {
-        var wordFound = await _unitOfWork.WordRepository.FirstOrDefaultAsync(x => x.Word == word);
+        var wordFound = await _unitOfWork.WordRepository.FindFullDefinition(word);
         return Ok(wordFound);
     }
 }

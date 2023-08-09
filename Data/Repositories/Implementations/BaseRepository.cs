@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Data.Repositories.Implementations;
 public class BaseRepository<T> : IBaseRepository<T> where T : class, IDatabaseObject
 {
-    readonly DictionaryDbContext _db;
-    readonly DbSet<T> _set;
+    protected readonly DictionaryDbContext _db;
+    protected readonly DbSet<T> _set;
     public BaseRepository(DictionaryDbContext db)
     {
         _db = db;

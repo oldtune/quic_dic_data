@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using AutoMapper;
 using Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +12,13 @@ public class WordController : ControllerBase
 {
     readonly IUnitOfWork _unitOfWork;
     readonly ILogger<WordController> _logger;
+    readonly IMapper _mapper;
 
-    public WordController(IUnitOfWork unitOfWork, ILogger<WordController> logger)
+    public WordController(IUnitOfWork unitOfWork,
+    ILogger<WordController> logger,
+    IMapper mapper)
     {
+        _mapper = mapper;
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
@@ -19,7 +26,12 @@ public class WordController : ControllerBase
     [HttpGet("{word}")]
     public async Task<IActionResult> GetWordDefinition(string word)
     {
-        var wordFound = await _unitOfWork.WordRepository.FindFullDefinition(word);
-        return Ok(wordFound);
+        var findResult = await _unitOfWork.WordRepository.FindFullDefinition(word);
+        if (findResult.Ok)
+        {
+            return Ok(_mapper.Map<WordResponse>(findResult.Unwrap()));
+        }
+
+        return BadRequest(findResult.GetError());
     }
 }

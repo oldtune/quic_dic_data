@@ -8,12 +8,12 @@ public class AutoMapperConfig : Profile
     {
         CreateMap<WordRecord, WordResponse>()
         .ForMember(x => x.Word, x => x.MapFrom(x => x.Word))
-        .ForMember(x => x.WordTypes, x => x.MapFrom(x => x.WordTypeLinks.Select(x => x.WordType)));
+        .ForMember(x => x.WordTypes, x => x.MapFrom(x => x.WordTypeLinks));
 
-        CreateMap<WordType, WordTypeResponse>()
-        .ForMember(x => x.WordTypeEn, x => x.MapFrom(x => x.En))
-        .ForMember(x => x.WordTypeVi, x => x.MapFrom(x => x.Vi))
-        .ForMember(x => x.Meanings, x => x.MapFrom(x => x.WordTypeLinks.Select(x => x.WordMeanings)));
+        CreateMap<WordTypeLink, WordTypeResponse>()
+        .ForMember(x => x.WordTypeEn, x => x.MapFrom(x => x.WordType.En))
+        .ForMember(x => x.WordTypeVi, x => x.MapFrom(x => x.WordType.Vi))
+        .ForMember(x => x.Meanings, x => x.MapFrom(x => x.WordMeanings));
 
         CreateMap<WordMeaning, WordMeaningResponse>()
         .ForMember(x => x.MeaningEn, x => x.MapFrom(x => x.EnMeaning))

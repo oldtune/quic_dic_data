@@ -6,5 +6,4 @@ public interface IUnitOfWork
 {
     public IWordRepository WordRepository { get; }
     public Task<Result<None>> SaveChanges();
-    public void Attach();
 }

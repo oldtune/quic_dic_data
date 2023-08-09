@@ -11,8 +11,12 @@ public class WordRepository : BaseRepository<WordRecord>, IWordRepository
 
     public async Task<Result<WordRecord>> FindFullDefinition(string word)
     {
-        return await Result.FromTask(() => _db.Words.Include(x => x.WordTypeLinks).ThenInclude(x => x.WordMeanings).ThenInclude(x => x.Examples)
-        .Include(x => x.WordTypeLinks).ThenInclude(x => x.WordType)
+        return await Result.FromTask(() =>
+        _db.Words.Include(x => x.WordTypeLinks)
+        .ThenInclude(x => x.WordMeanings)
+        .ThenInclude(x => x.Examples)
+        .Include(x => x.WordTypeLinks)
+        .ThenInclude(x => x.WordType)
         .FirstOrDefaultAsync(x => x.Word == word));
     }
 }

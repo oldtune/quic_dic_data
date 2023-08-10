@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using AutoMapper;
 using Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -33,5 +31,23 @@ public class WordController : ControllerBase
         }
 
         return BadRequest(findResult.GetError());
+    }
+
+    [HttpGet("suggest")]
+    public async Task<IActionResult> GetSuggestion(string keyword)
+    {
+        var findResult = await _unitOfWork.WordRepository.QueryAsync(filter: x => x.Word.StartsWith(keyword),
+         selector: x => x.Word,
+         skip: 0,
+         take: 20,
+         sort: x => x.Word);
+
+        if (findResult.Ok)
+        {
+            var result = findResult.Unwrap();
+            return Ok(result);
+        }
+
+        return Ok(Enumerable.Empty<string>());
     }
 }

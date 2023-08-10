@@ -54,10 +54,26 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IDatabaseOb
         return await Result.FromTask(() => _set.FirstOrDefaultAsync(predicate));
     }
 
-    public async Task<Result<List<TResult>>> QueryAsync<TResult>(Expression<Func<T, TResult>> selector = null,
+    public async Task<Result<List<TResult>>> QueryAsync<TResult>(Expression<Func<T, TResult>> selector,
      Expression<Func<T, bool>> filter = null)
     {
-        return await Result.FromTask(() => _set.Where(filter).Select(selector).ToListAsync());
+        var refinedFilter = filter ?? ((T x) => true);
+        return await Result.FromTask(() => _set.Where(refinedFilter).Select(selector).ToListAsync());
+    }
+
+    public async Task<Result<List<TResult>>> QueryAsync<TResult, TSort>(Expression<Func<T, TResult>> selector,
+    Expression<Func<T, TSort>> sort,
+    Expression<Func<T, bool>> filter = null,
+    int skip = 0,
+    int take = 0)
+    {
+        var refinedFilter = filter ?? ((T x) => true);
+        return await Result.FromTask(() => _set.Where(refinedFilter)
+        .OrderBy(sort)
+        .Skip(skip)
+        .Take(take)
+        .Select(selector)
+        .ToListAsync());
     }
 
     public void Update(T obj)

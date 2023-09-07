@@ -8,6 +8,7 @@ public class AutoMapperConfig : Profile
     {
         CreateMap<WordRecord, WordResponse>()
         .ForMember(x => x.Word, x => x.MapFrom(x => x.Word))
+        .ForMember(x => x.PronounceVi, x => x.MapFrom(x => x.ViPronounce))
         .ForMember(x => x.WordTypes, x => x.MapFrom(x => x.WordTypeLinks));
 
         CreateMap<WordTypeLink, WordTypeResponse>()
